@@ -6,6 +6,7 @@ import static io.mosip.idrepository.core.constant.IdRepoErrorConstants.BIO_EXTRA
 import static io.mosip.idrepository.core.constant.IdRepoErrorConstants.DATABASE_ACCESS_ERROR;
 import static io.mosip.idrepository.core.constant.IdRepoErrorConstants.DOCUMENT_HASH_MISMATCH;
 import static io.mosip.idrepository.core.constant.IdRepoErrorConstants.ID_OBJECT_PROCESSING_FAILED;
+import static io.mosip.idrepository.core.constant.IdRepoErrorConstants.INVALID_INPUT_PARAMETER;
 import static io.mosip.idrepository.core.constant.IdRepoErrorConstants.NO_RECORD_FOUND;
 import static io.mosip.idrepository.core.constant.IdRepoErrorConstants.RECORD_EXISTS;
 
@@ -13,6 +14,9 @@ import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import jakarta.annotation.Resource;
@@ -162,6 +166,10 @@ public class IdRepoProxyServiceImpl implements IdRepoService<IdRequestDTO, IdRes
 	/** Ida event type name. */
 	private String idaEventTypeName;
 
+	/** Total seconds to wait for all modality extractions to complete. */
+	@Value("${mosip.idrepo.bio.extraction.timeout-seconds:30}")
+	private long extractionTimeoutSeconds;
+
 	/*
 	 * (non-Javadoc)
 	 *
@@ -238,7 +246,7 @@ public class IdRepoProxyServiceImpl implements IdRepoService<IdRequestDTO, IdRes
 			throws IdRepoAppException {
 		long startNanos = System.nanoTime();
 		try {
-			mosipLogger.info(IdRepoSecurityManager.getUser(), ID_REPO_SERVICE_IMPL, RETRIEVE_IDENTITY,
+			mosipLogger.debug(IdRepoSecurityManager.getUser(), ID_REPO_SERVICE_IMPL, RETRIEVE_IDENTITY,
 					"RETRIEVE_IDENTITY START idType=" + idType + ", type=" + type + ", id=" + id
 							+ ", extractionFormatKeys="
 							+ (extractionFormats == null || extractionFormats.isEmpty() ? "[]"
@@ -318,10 +326,15 @@ public class IdRepoProxyServiceImpl implements IdRepoService<IdRequestDTO, IdRes
 	 * @return the string
 	 */
 	protected String retrieveUinHash(String uin) {
-		int saltId = securityManager.getSaltKeyForId(uin);
-		String hashSalt = uinHashSaltRepo.retrieveSaltById(saltId);
-		String hashwithSalt = securityManager.hashwithSalt(uin.getBytes(), hashSalt.getBytes());
-		return saltId + SPLITTER + hashwithSalt;
+		try {
+			int saltId = securityManager.getSaltKeyForId(uin);
+			String hashSalt = uinHashSaltRepo.retrieveSaltById(saltId);
+			String hashwithSalt = securityManager.hashwithSalt(uin.getBytes(), hashSalt.getBytes());
+			return saltId + SPLITTER + hashwithSalt;
+		} catch (NumberFormatException e) {
+			throw new IdRepoAppUncheckedException(INVALID_INPUT_PARAMETER.getErrorCode(),
+					String.format(INVALID_INPUT_PARAMETER.getErrorMessage(), "id"), e);
+		}
 	}
 
 	/**
@@ -493,12 +506,15 @@ public class IdRepoProxyServiceImpl implements IdRepoService<IdRequestDTO, IdRes
 
 			for (BiometricType modality : SUPPORTED_MODALITIES) {
 				List<BIR> birTypesForModality = originalBirs.stream()
-						.filter(bir -> bir.getBdbInfo().getType().get(0).value().equalsIgnoreCase(modality.value()))
-						.filter(bir -> bir.getOthers().keySet().stream()
-								.anyMatch(key -> key.contentEquals("EXCEPTION")))
-						.filter(bir -> bir.getOthers().get("EXCEPTION").contentEquals("false"))
+						.filter(bir -> {
+							List<BiometricType> types = bir.getBdbInfo().getType();
+							return !types.isEmpty() && types.get(0).value().equalsIgnoreCase(modality.value());
+						})
+						.filter(bir -> {
+							Map<String, String> others = bir.getOthers();
+							return others == null || "false".equalsIgnoreCase(others.get("EXCEPTION"));
+						})
 						.collect(Collectors.toList());
-
 				Optional<Entry<String, String>> extractionFormatForModality = extractionFormats.entrySet().stream()
 						.filter(ent -> ent.getKey().toLowerCase().contains(modality.value().toLowerCase())).findAny();
 
@@ -515,10 +531,29 @@ public class IdRepoProxyServiceImpl implements IdRepoService<IdRequestDTO, IdRes
 				}
 			}
 
-			CompletableFuture.allOf(extractionFutures.toArray(new CompletableFuture<?>[extractionFutures.size()]))
-					.join();
+			originalBirs.clear(); // release parsed BIR list before blocking on futures - reduces live set during wait
+
+			// Wait for all modality extractions with a hard deadline.
+			// Previously .join() was used with no timeout, blocking indefinitely.
+			// Now .get(timeout) bounds the wait to mosip.idrepo.bio.extraction.timeout-seconds.
+			try {
+				CompletableFuture.allOf(extractionFutures.toArray(new CompletableFuture<?>[0]))
+						.get(extractionTimeoutSeconds, TimeUnit.SECONDS);
+			} catch (TimeoutException e) {
+				extractionFutures.forEach(f -> f.cancel(true));
+				mosipLogger.error(IdRepoSecurityManager.getUser(), ID_REPO_SERVICE_IMPL, "extractTemplate",
+						"Biometric extraction timed out after " + extractionTimeoutSeconds + "s");
+				throw new IdRepoAppUncheckedException(BIO_EXTRACTION_ERROR, e);
+			} catch (ExecutionException e) {
+				Throwable cause = e.getCause();
+				if (cause instanceof IdRepoAppUncheckedException)
+					throw (IdRepoAppUncheckedException) cause;
+				throw new IdRepoAppUncheckedException(BIO_EXTRACTION_ERROR, cause);
+			}
+			// All futures completed normally; getNow() retrieves without a second blocking call
+			// (replaces the previous redundant future.get() loop after the join).
 			for (CompletableFuture<List<BIR>> future : extractionFutures) {
-				finalBirs.addAll(future.get());
+				finalBirs.addAll(future.getNow(Collections.emptyList()));
 			}
 
 			return cbeffUtil.createXML(finalBirs);
@@ -713,6 +748,11 @@ public class IdRepoProxyServiceImpl implements IdRepoService<IdRequestDTO, IdRes
 			String uinHash = getUinHash(individualId, idType);
 			return service.getRemainingUpdateCountByIndividualId(uinHash, idType,
 					Objects.isNull(attributeList) ? List.of() : attributeList);
+		} catch (NumberFormatException e) {
+			throw new IdRepoAppException(INVALID_INPUT_PARAMETER.getErrorCode(),
+					String.format(INVALID_INPUT_PARAMETER.getErrorMessage(), "id"), e);
+		} catch (IdRepoAppUncheckedException e) {
+			throw new IdRepoAppException(e.getErrorCode(), e.getErrorText(), e);
 		} finally {
 			IdentityServicePerformanceLog.log(mosipLogger, "IdRepoProxyServiceImpl",
 					"getRemainingUpdateCountByIndividualId", startNanos);

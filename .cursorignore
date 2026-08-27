@@ -1,0 +1,31 @@
+# Build / IDE -- never index or dump into agent context
+**/target/
+**/.idea/
+**/*.iml
+**/.settings/
+**/.classpath
+**/.project
+**/bin/
+**/.vertx/
+
+# Compiled / packaged
+**/*.class
+**/*.jar
+**/*.war
+**/*.ear
+
+# Mock SBI / keystore binaries (read only if the task truly needs the file)
+**/*.iso
+**/*.wsq
+**/*.p12
+**/*.jks
+**/mds/**/*.jpeg
+**/mds/**/*.jpg
+
+# Logs / temp / local secrets
+**/logs/
+**/*.log
+**/*.tmp
+**/.env.local
+**/keys/*.p12
+**/mosip-idrepo-ks.p12

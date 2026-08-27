@@ -1,5 +1,8 @@
 package io.mosip.kernel.auth.defaultadapter.helper;
 
+import java.security.PublicKey;
+import java.util.Objects;
+
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -7,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
 import io.mosip.kernel.auth.defaultadapter.constant.AuthAdapterErrorCode;
@@ -14,8 +18,8 @@ import io.mosip.kernel.auth.defaultadapter.exception.AuthManagerException;
 import io.mosip.kernel.openid.bridge.model.MosipUserDto;
 
 /**
- * Spring 7 / Boot 4 shadow of {@code kernel-auth-adapter} {@code TokenValidationHelper}.
- * Registered via {@link io.mosip.idrepository.config.IdRepoKernelAuthHelperConfig}.
+ * Spring Framework 7 / Boot 4 shadow of kernel-auth {@code TokenValidationHelper} (v1.3.1).
+ * Behavior matches openid-bridge; registered via {@link io.mosip.idrepository.config.IdRepoKernelAuthHelperConfig}.
  */
 public class TokenValidationHelper {
 
@@ -67,10 +71,14 @@ public class TokenValidationHelper {
 		if (activeProfile.equalsIgnoreCase("local")) {
 			return validateTokenHelper.doOfflineLocalTokenValidation(token);
 		}
-		DecodedJWT decodedJWT = com.auth0.jwt.JWT.decode(token);
-		java.security.PublicKey publicKey = validateTokenHelper.getPublicKey(decodedJWT);
-		if (java.util.Objects.isNull(publicKey)) {
-			return doOnlineTokenValidation(token, restTemplate);
+		return doOfflineEnvTokenValidation(token, restTemplate);
+	}
+
+	private MosipUserDto doOfflineEnvTokenValidation(String jwtToken, RestTemplate restTemplate) {
+		DecodedJWT decodedJWT = JWT.decode(jwtToken);
+		PublicKey publicKey = validateTokenHelper.getPublicKey(decodedJWT);
+		if (Objects.isNull(publicKey)) {
+			return doOnlineTokenValidation(jwtToken, restTemplate);
 		}
 
 		ImmutablePair<Boolean, AuthAdapterErrorCode> validateResp = validateTokenHelper.isTokenValid(decodedJWT,
@@ -79,7 +87,7 @@ public class TokenValidationHelper {
 			throw new AuthManagerException(validateResp.getRight().getErrorCode(),
 					validateResp.getRight().getErrorMessage());
 		}
-		return validateTokenHelper.buildMosipUser(decodedJWT, token);
+		return validateTokenHelper.buildMosipUser(decodedJWT, jwtToken);
 	}
 
 	public MosipUserDto doOnlineTokenValidation(String token, WebClient webClient) {
@@ -102,5 +110,4 @@ public class TokenValidationHelper {
 
 		return validateResp.getRight();
 	}
-
 }

@@ -19,8 +19,9 @@ AddIdentity:
   "dateOfBirth": "1992/04/15",
    
   "postalCode": "14022",
-  "email": "$EMAILVALUE$",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "email": "mosipuser123@mailinator.com",
+  "phone": "8249742850",
+  "mobileno": "8249742850",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
  
@@ -53,8 +54,9 @@ AddIdentity:
   "dateOfBirth": "1992/04/15",
    
   "postalCode": "14022",
-  "email": "$EMAILVALUE$",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "email": "mosipuser123@mailinator.com",
+  "phone": "8249742850",
+  "mobileno": "8249742850",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
   
@@ -87,8 +89,9 @@ AddIdentity:
   "dateOfBirth": "1992/04/15",
    
   "postalCode": "14022",
-  "email": "$EMAILVALUE$",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "email": "mosipuser123@mailinator.com",
+  "phone": "8249742850",
+  "mobileno": "8249742850",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
   
@@ -122,8 +125,9 @@ AddIdentity:
   "dateOfBirth": "1992/04/15",
     
   "postalCode": "14022",
-  "email": "$EMAILVALUE$",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "email": "mosipuser123@mailinator.com",
+  "phone": "8249742850",
+  "mobileno": "8249742850",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
   
@@ -157,8 +161,9 @@ AddIdentity:
   "dateOfBirth": "1992/04/15",
     
   "postalCode": "14022",
-  "email": "$EMAILVALUE$",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "email": "mosipuser123@mailinator.com",
+  "phone": "8249742850",
+  "mobileno": "8249742850",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
   
@@ -191,8 +196,9 @@ AddIdentity:
   "dateOfBirth": "1992/04/15",
    
   "postalCode": "14022",
-  "email": "$EMAILVALUE$",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "email": "mosipuser123@mailinator.com",
+  "phone": "8249742850",
+  "mobileno": "8249742850",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
  
@@ -225,8 +231,9 @@ AddIdentity:
   "dateOfBirth": "1992/04/15",
    
   "postalCode": "14022",
-  "email": "$EMAILVALUE$",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "email": "mosipuser123@mailinator.com",
+  "phone": "8249742850",
+  "mobileno": "8249742850",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
  
@@ -259,8 +266,9 @@ AddIdentity:
   "dateOfBirth": "1992/04/15",
    
   "postalCode": "14022",
-  "email": "$EMAILVALUE$",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "email": "mosipuser123@mailinator.com",
+  "phone": "8249742850",
+  "mobileno": "8249742850",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
   
@@ -293,8 +301,9 @@ AddIdentity:
   "dateOfBirth": "1992/04/15",
    
   "postalCode": "14022",
-  "email": "$EMAILVALUE$",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "email": "mosipuser123@mailinator.com",
+  "phone": "8249742850",
+  "mobileno": "8249742850",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
   
@@ -332,8 +341,9 @@ AddIdentity:
   "dateOfBirth": "1992/04/15",
   
   "postalCode": "14022",
-  "email": "$EMAILVALUE$",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "email": "mosipuser123@mailinator.com",
+  "phone": "8249742850",
+  "mobileno": "8249742850",
   "referenceIdentityNumber": "6789545678878",
   "version": "awge",
   
@@ -372,8 +382,9 @@ AddIdentity:
   "dateOfBirth": "1992/04/15",
   
   "postalCode": "14022",
-  "email": "$EMAILVALUE$",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "email": "mosipuser123@mailinator.com",
+  "phone": "8249742850",
+  "mobileno": "8249742850",
   "referenceIdentityNumber": "6789545678878",
   "version": "",
   
@@ -411,8 +422,9 @@ AddIdentity:
   "dateOfBirth": "1992/04/15",
   
   "postalCode": "14022",
-  "email": "$EMAILVALUE$",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "email": "mosipuser123@mailinator.com",
+  "phone": "8249742850",
+  "mobileno": "8249742850",
   "referenceIdentityNumber": "6789545678878",
   "version": " ",
   
@@ -433,7 +445,6 @@ AddIdentity:
    IdRepository_AddIdentity_withInvalidDOB:
       endPoint: /idrepository/v1/identity/
       description: Creating UIN in Add Identity passing invalid DOB
-      requiredSchemaFields: [dateOfBirth]
       uniqueIdentifier: TC_IDRepo_AddIdentity_13
       role: testrig
       restMethod: post
@@ -451,8 +462,9 @@ AddIdentity:
   "dateOfBirth": "19-b-5",
    
   "postalCode": "14022",
-  "email": "$EMAILVALUE$",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "email": "mosipuser123@mailinator.com",
+  "phone": "8249742850",
+  "mobileno": "8249742850",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
   
@@ -474,7 +486,6 @@ AddIdentity:
    IdRepository_AddIdentity_with_Missing_DOB:
       endPoint: /idrepository/v1/identity/
       description: Creating UIN in Add Identity by removing DOB field
-      requiredSchemaFields: [dateOfBirth]
       uniqueIdentifier: TC_IDRepo_AddIdentity_14
       role: testrig
       restMethod: post
@@ -492,8 +503,9 @@ AddIdentity:
   "dateOfBirth": "$REMOVE$",
    
   "postalCode": "14022",
-  "email": "$EMAILVALUE$",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "email": "mosipuser123@mailinator.com",
+  "phone": "8249742850",
+  "mobileno": "8249742850",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
   
@@ -514,7 +526,6 @@ AddIdentity:
    IdRepository_AddIdentity_with_Empty_DOB:
       endPoint: /idrepository/v1/identity/
       description: Creating UIN in Add Identity passing empty DOB field
-      requiredSchemaFields: [dateOfBirth]
       uniqueIdentifier: TC_IDRepo_AddIdentity_15
       role: testrig
       restMethod: post
@@ -532,8 +543,9 @@ AddIdentity:
   "dateOfBirth": "",
    
   "postalCode": "14022",
-  "email": "$EMAILVALUE$",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "email": "mosipuser123@mailinator.com",
+  "phone": "8249742850",
+  "mobileno": "8249742850",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
   
@@ -554,7 +566,6 @@ AddIdentity:
    IdRepository_AddIdentity_with_Spaceval_DOB:
       endPoint: /idrepository/v1/identity/
       description: Creating UIN in Add Identity passing space value in DOB
-      requiredSchemaFields: [dateOfBirth]
       uniqueIdentifier: TC_IDRepo_AddIdentity_16
       role: testrig
       restMethod: post
@@ -572,8 +583,9 @@ AddIdentity:
   "dateOfBirth": " ",
    
   "postalCode": "14022",
-  "email": "$EMAILVALUE$",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "email": "mosipuser123@mailinator.com",
+  "phone": "8249742850",
+  "mobileno": "8249742850",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
   
@@ -594,7 +606,6 @@ AddIdentity:
    IdRepository_AddIdentity_withInvalidEmail:
       endPoint: /idrepository/v1/identity/
       description: Creating UIN in Add Identity passing invalid email
-      requiredSchemaFields: [email]
       uniqueIdentifier: TC_IDRepo_AddIdentity_17
       role: testrig
       restMethod: post
@@ -613,7 +624,8 @@ AddIdentity:
    
   "postalCode": "14022",
   "email": "mosipuser.com",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "phone": "8249742850",
+  "mobileno": "8249742850",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
   
@@ -651,8 +663,9 @@ AddIdentity:
   "dateOfBirth": "1992/04/15",
    
   "postalCode": "14022",
-  "email": "$EMAILVALUE$",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "email": "mosipuser123@mailinator.com",
+  "phone": "8249742850",
+  "mobileno": "8249742850",
   "referenceIdentityNumber": "6789545678878",
   "version": "$REMOVE$",
  
@@ -677,7 +690,7 @@ AddIdentity:
       role: testrig
       restMethod: post
       inputTemplate: idRepository/AddIdentity/addIdentity_$LANGNUMBER$
-      outputTemplate: idRepository/AddIdentity/addIdentityResult
+      outputTemplate: idRepository/error
       input: '{
   "value": "$BIOVALUE$",
   "id": "mosip.id.create",
@@ -690,8 +703,9 @@ AddIdentity:
   "dateOfBirth": "1992/04/15",
     
   "postalCode": "14022",
-  "email": "$EMAILVALUE$",
+  "email": "mosipuser123@mailinator.com",
   "phone": "$REMOVE$",
+  "mobileno": "$REMOVE$",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
  
@@ -702,13 +716,17 @@ AddIdentity:
    "requesttime": "$TIMESTAMP$"
 }'
       output: '{
-  "status":"ACTIVATED"
+   "errors": [
+    {
+      "errorCode": "IDR-IDC-001",
+      "message": "Missing Input Parameter - identity/phone"
+    }
+  ]
 }'
 
    IdRepository_AddIdentity_with_invalid_Email:
       endPoint: /idrepository/v1/identity/
       description: Creating UIN in Add Identity passing invalid Email
-      requiredSchemaFields: [email]
       uniqueIdentifier: TC_IDRepo_AddIdentity_20
       role: testrig
       restMethod: post
@@ -727,7 +745,8 @@ AddIdentity:
    
   "postalCode": "14022",
   "email": "sdafa%%$#$%%",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "phone": "9876543210",
+  "mobileno": "9876543210",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
   
@@ -748,7 +767,6 @@ AddIdentity:
       endPoint: /idrepository/v1/identity/
       description: Creating UIN in Add Identity removing Email field
       uniqueIdentifier: TC_IDRepo_AddIdentity_21
-      requiredSchemaFields: [email]
       role: testrig
       restMethod: post
       inputTemplate: idRepository/AddIdentity/addIdentity_$LANGNUMBER$
@@ -759,27 +777,29 @@ AddIdentity:
   "registrationId": "$RID$",
   "addressCopy": "Y",
   "biometricReferenceId": "23452353",
- 
+
    "UIN": "$UIN$",
-  
+
   "dateOfBirth": "1992/04/15",
-    
+
   "postalCode": "14022",
   "email": "$REMOVE$",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "phone": "9876543210",
+  "mobileno": "9876543210",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
- 
+
    "introducerRID": "212124324784879",
    "introducerUIN": "212124324784879",
-  
+
    "category": "individualBiometrics",
    "requesttime": "$TIMESTAMP$"
 }'
       output: '{
    "errors": [
     {
-      "errorCode": "IDR-IDC-002"
+      "errorCode": "IDR-IDC-001",
+      "message": "Missing Input Parameter - identity/email"
     }
   ]
 }'
@@ -787,7 +807,6 @@ AddIdentity:
    IdRepository_AddIdentity_with_Empty_Email:
       endPoint: /idrepository/v1/identity/
       description: Creating UIN in Add Identity passing empty email
-      requiredSchemaFields: [email]
       uniqueIdentifier: TC_IDRepo_AddIdentity_22
       role: testrig
       restMethod: post
@@ -806,7 +825,8 @@ AddIdentity:
     
   "postalCode": "14022",
   "email": "",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "phone": "9876543210",
+  "mobileno": "9876543210",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
  
@@ -827,7 +847,6 @@ AddIdentity:
    IdRepository_AddIdentity_with_SpaceVal_Email:
       endPoint: /idrepository/v1/identity/
       description: Creating UIN in Add Identity passing space value in email
-      requiredSchemaFields: [email]
       uniqueIdentifier: TC_IDRepo_AddIdentity_23
       role: testrig
       restMethod: post
@@ -846,7 +865,8 @@ AddIdentity:
     
   "postalCode": "14022",
   "email": " ",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "phone": "9876543210",
+  "mobileno": "9876543210",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
  
@@ -884,8 +904,9 @@ AddIdentity:
   "dateOfBirth": "1992/04/15",
    
   "postalCode": "14022",
-  "email": "$EMAILVALUE$",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "email": "mosipuser123@mailinator.com",
+  "phone": "8249742850",
+  "mobileno": "8249742850",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
  
@@ -908,7 +929,6 @@ AddIdentity:
       description: Creating UIN in Add Identity passing invalid past timestamp
       uniqueIdentifier: TC_IDRepo_AddIdentity_25
       role: testrig
-      checkErrorsOnlyInResponse: true
       restMethod: post
       inputTemplate: idRepository/AddIdentity/addIdentity_$LANGNUMBER$
       outputTemplate: idRepository/error
@@ -924,8 +944,9 @@ AddIdentity:
   "dateOfBirth": "1992/04/15",
    
   "postalCode": "14022",
-  "email": "$EMAILVALUE$",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "email": "mosipuser123@mailinator.com",
+  "phone": "8249742850",
+  "mobileno": "8249742850",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
  
@@ -963,8 +984,9 @@ AddIdentity:
   "dateOfBirth": "1992/04/15",
    
   "postalCode": "14022",
-  "email": "$EMAILVALUE$",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "email": "mosipuser123@mailinator.com",
+  "phone": "8249742850",
+  "mobileno": "8249742850",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
  
@@ -1002,8 +1024,9 @@ AddIdentity:
   "dateOfBirth": "1992/04/15",
    
   "postalCode": "14022",
-  "email": "$EMAILVALUE$",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "email": "mosipuser123@mailinator.com",
+  "phone": "8249742850",
+  "mobileno": "8249742850",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
  
@@ -1041,8 +1064,9 @@ AddIdentity:
   "dateOfBirth": "1992/04/15",
    
   "postalCode": "14022",
-  "email": "$EMAILVALUE$",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "email": "mosipuser123@mailinator.com",
+  "phone": "8249742850",
+  "mobileno": "8249742850",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
  
@@ -1079,8 +1103,9 @@ AddIdentity:
   "dateOfBirth": "1992/04/15",
    
   "postalCode": "14022",
-  "email": "$EMAILVALUE$",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "email": "mosipuser123@mailinator.com",
+  "phone": "8249742850",
+  "mobileno": "8249742850",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
  
@@ -1117,8 +1142,9 @@ AddIdentity:
   "dateOfBirth": "1992/04/15",
    
   "postalCode": "14022",
-  "email": "$EMAILVALUE$",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "email": "mosipuser123@mailinator.com",
+  "phone": "8249742850",
+  "mobileno": "8249742850",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
  
@@ -1156,8 +1182,9 @@ AddIdentity:
   "dateOfBirth": "1992/04/15",
    
   "postalCode": "14022",
-  "email": "$EMAILVALUE$",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "email": "mosipuser123@mailinator.com",
+  "phone": "8249742850",
+  "mobileno": "8249742850",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
  
@@ -1191,8 +1218,9 @@ AddIdentity:
   "dateOfBirth": "1992/04/15",
    
   "postalCode": "14022",
-  "email": "$EMAILVALUE$",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "email": "mosipuser123@mailinator.com",
+  "phone": "8249742850",
+  "mobileno": "8249742850",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
  
@@ -1226,8 +1254,9 @@ AddIdentity:
   "dateOfBirth": "1992/04/15",
    
   "postalCode": "14022",
-  "email": "$EMAILVALUE$",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "email": "mosipuser123@mailinator.com",
+  "phone": "8249742850",
+  "mobileno": "8249742850",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
  
@@ -1261,8 +1290,9 @@ AddIdentity:
   "dateOfBirth": "1992/04/15",
    
   "postalCode": "14022",
-  "email": "$EMAILVALUE$",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "email": "mosipuser123@mailinator.com",
+  "phone": "8249742850",
+  "mobileno": "8249742850",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
  
@@ -1296,8 +1326,9 @@ AddIdentity:
   "dateOfBirth": "1992/04/15",
    
   "postalCode": "14022",
-  "email": "$EMAILVALUE$",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "email": "mosipuser123@mailinator.com",
+  "phone": "8249742850",
+  "mobileno": "8249742850",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
  
@@ -1331,8 +1362,9 @@ AddIdentity:
   "dateOfBirth": "1992/04/15",
    
   "postalCode": "14022",
-  "email": "$EMAILVALUE$",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "email": "mosipuser123@mailinator.com",
+  "phone": "8249742850",
+  "mobileno": "8249742850",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
  
@@ -1366,8 +1398,9 @@ AddIdentity:
   "dateOfBirth": "1992/04/15",
    
   "postalCode": "14022",
-  "email": "$EMAILVALUE$",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "email": "mosipuser123@mailinator.com",
+  "phone": "8249742850",
+  "mobileno": "8249742850",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
  
@@ -1401,8 +1434,9 @@ AddIdentity:
   "dateOfBirth": "1992/04/15",
    
   "postalCode": "14022",
-  "email": "$EMAILVALUE$",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "email": "mosipuser123@mailinator.com",
+  "phone": "8249742850",
+  "mobileno": "8249742850",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
  
@@ -1436,8 +1470,9 @@ AddIdentity:
   "dateOfBirth": "1992/04/15",
    
   "postalCode": "14022",
-  "email": "$EMAILVALUE$",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "email": "mosipuser123@mailinator.com",
+  "phone": "8249742850",
+  "mobileno": "8249742850",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
  
@@ -1470,8 +1505,9 @@ AddIdentity:
   "dateOfBirth": "1992/04/15",
    
   "postalCode": "14022",
-  "email": "$EMAILVALUE$",
-  "phone": "$PHONENUMBERFORIDENTITY$",
+  "email": "mosipuser123@mailinator.com",
+  "phone": "8249742850",
+  "mobileno": "8249742850",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
  
@@ -1536,20 +1572,55 @@ AddIdentity:
   "registrationId": "$RID$",
   "addressCopy": "Y",
   "biometricReferenceId": "23452353",
- 
+
    "UIN": "$VALID_UIN_NOTIN_DB$",
-   
+
   "dateOfBirth": "1992/04/15",
-   
+
   "postalCode": "14022",
   "email": "$EMAILVALUE$",
   "phone": "$PHONENUMBERFORIDENTITY$",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",
- 
+
    "introducerRID": "212124324784879",
    "introducerUIN": "212124324784879",
-   
+
+   "category": "individualBiometrics",
+   "requesttime": "$TIMESTAMP$"
+}'
+      output: '{
+   "status":"ACTIVATED"
+}'
+   IdRepository_AddIdentity_WithVerifiedAttributeAsListOfString_Pos:
+      endPoint: /idrepository/v1/identity/
+      description: Validate that Add Identity V1 successfully creates identity when verifiedAttribute is provided as a list of fieldId strings
+      uniqueIdentifier: TC_IDRepo_AddIdentity_43
+      role: testrig
+      restMethod: post
+      inputTemplate: idRepository/AddIdentity/addIdentity_$LANGNUMBER$
+      outputTemplate: idRepository/AddIdentity/addIdentityResult
+      input: '{
+  "value": "$BIOVALUE$",
+  "id": "mosip.id.create",
+  "registrationId": "$RID$",
+  "addressCopy": "Y",
+  "biometricReferenceId": "23452353",
+
+   "UIN": "$UIN$",
+
+  "dateOfBirth": "1992/04/15",
+
+  "postalCode": "14022",
+  "email": "$EMAILVALUE$",
+  "phone": "$PHONENUMBERFORIDENTITY$",
+  "referenceIdentityNumber": "6789545678878",
+  "verifiedAttribute": ["fullName", "address"],
+  "version": "v1",
+
+   "introducerRID": "212124324784879",
+   "introducerUIN": "212124324784879",
+
    "category": "individualBiometrics",
    "requesttime": "$TIMESTAMP$"
 }'

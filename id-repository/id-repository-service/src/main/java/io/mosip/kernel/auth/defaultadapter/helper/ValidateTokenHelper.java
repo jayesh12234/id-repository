@@ -32,10 +32,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
-
-import reactor.core.publisher.Mono;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import com.auth0.jwk.Jwk;
 import com.auth0.jwk.JwkException;
@@ -61,10 +59,9 @@ import io.mosip.kernel.openid.bridge.model.MosipUserDto;
 import jakarta.annotation.PostConstruct;
 
 /**
- * Spring Framework 7 / Boot 4 replacement for {@code kernel-auth-adapter} {@code ValidateTokenHelper}.
- * <p>
- * Fixes {@code HttpEntity(Object, MultiValueMap)} usage in online token validation (RestTemplate path).
- * </p>
+ * Spring Framework 7 / Boot 4 shadow of kernel-auth {@code ValidateTokenHelper} (v1.3.1).
+ * API changes vs openid-bridge: typed {@code HttpEntity}, {@code retrieve()}, and WebClient
+ * body decoded as {@code String} then Jackson 2 (Boot 4 codecs are Jackson 3).
  */
 public class ValidateTokenHelper {
 
@@ -81,15 +78,30 @@ public class ValidateTokenHelper {
 	@Value("${auth.server.admin.issuer.domain.validate:true}")
 	private boolean validateIssuerDomain;
 
+	/**
+	 * This should be same as the value in the token
+	 */
 	@Value("${auth.server.admin.issuer.uri:}")
 	private String issuerURI;
 
+	/**
+	 * This property will directly apply the certs URL without need for constructing the path from issuer URL.
+	 * This is useful to keep a different certs URL for integrating with MOSIP IdP for token validation.
+	 */
 	@Value("${auth.server.admin.oidc.certs.url:}")
 	private String certsUrl;
 
+	/**
+	 * This property will directly apply the userInfo URL without need for constructing the path from issuer URL.
+	 * This is useful to keep a different userInfo URL for integrating with MOSIP IdP for token validation.
+	 */
 	@Value("${auth.server.admin.oidc.userinfo.url:}")
 	private String userInfoUrl;
 
+	/**
+	 * When we validate a token we use the issuerURL. In case you want us to
+	 * validate using an internal URL then the same has to be configured here.
+	 */
 	@Value("${auth.server.admin.issuer.internal.uri:}")
 	private String issuerInternalURI;
 
@@ -113,7 +125,7 @@ public class ValidateTokenHelper {
 				environment.getProperty("auth.server.admin.allowed.audience", List.class, Collections.emptyList()));
 		issuerInternalURI = issuerInternalURI.trim().isEmpty() ? issuerURI : issuerInternalURI;
 	}
-
+	@SuppressWarnings("java:S2259")
 	private String getApplicationName() {
 		String appNames = environment.getProperty("spring.application.name");
 		if (appNames != null && !EmptyCheckUtils.isNullEmpty(appNames)) {
@@ -122,14 +134,13 @@ public class ValidateTokenHelper {
 		}
 		throw new RuntimeException("property spring.application.name not found");
 	}
-
 	public MosipUserDto doOfflineLocalTokenValidation(String jwtToken) {
 		LOGGER.info("offline verification for local profile.");
 		throw new AuthManagerException(OFFLINE_AUTH_DEPRECATED.getErrorCode(), OFFLINE_AUTH_DEPRECATED.getErrorMessage());
 	}
-
 	public ImmutablePair<Boolean, AuthAdapterErrorCode> isTokenValid(DecodedJWT decodedJWT, PublicKey publicKey) {
-		LocalDateTime expiryTime = DateUtils2.parseDateToLocalDateTime(decodedJWT.getExpiresAt());
+		LocalDateTime expiryTime = DateUtils2
+				.convertUTCToLocalDateTime(DateUtils2.getUTCTimeFromDate(decodedJWT.getExpiresAt()));
 		String userName = decodedJWT.getClaim(AuthAdapterConstant.PREFERRED_USERNAME).asString();
 		if (!DateUtils2.before(DateUtils2.getUTCCurrentDateTime(), expiryTime)) {
 			LOGGER.error("Provided Auth Token expired. Throwing Authentication Exception. UserName: " + userName);
@@ -177,7 +188,6 @@ public class ValidateTokenHelper {
 		}
 		return matchFound;
 	}
-
 	private boolean getTokenIssuerDomain(DecodedJWT decodedJWT) {
 		String domain = decodedJWT.getClaim(AuthAdapterConstant.ISSUER).asString();
 		try {
@@ -190,7 +200,6 @@ public class ValidateTokenHelper {
 		}
 		return false;
 	}
-
 	public PublicKey getPublicKey(DecodedJWT decodedJWT) {
 		String userName = decodedJWT.getClaim(AuthAdapterConstant.PREFERRED_USERNAME).asString();
 		LOGGER.info("offline verification for environment profile. UserName: " + userName);
@@ -210,16 +219,13 @@ public class ValidateTokenHelper {
 		}
 		return publicKey;
 	}
-
 	private String getRealM(DecodedJWT decodedJWT) {
 		String tokenIssuer = decodedJWT.getClaim(AuthAdapterConstant.ISSUER).asString();
 		return tokenIssuer.substring(tokenIssuer.lastIndexOf('/') + 1);
 	}
-
 	private PublicKey getIssuerPublicKey(String keyId, String certsPathVal, String realm) {
 		return getIssuerPublicKey(keyId, issuerInternalURI + realm + certsPathVal);
 	}
-
 	private PublicKey getIssuerPublicKey(String keyId, String certsUrIPath) {
 		try {
 			URI uri = new URI(certsUrIPath).normalize();
@@ -232,15 +238,18 @@ public class ValidateTokenHelper {
 		}
 		return null;
 	}
-
 	private Algorithm getVerificationAlgorithm(String tokenAlgo, PublicKey publicKey) {
-		return switch (tokenAlgo) {
-			case "RS384" -> Algorithm.RSA384((RSAPublicKey) publicKey, null);
-			case "RS512" -> Algorithm.RSA512((RSAPublicKey) publicKey, null);
-			default -> Algorithm.RSA256((RSAPublicKey) publicKey, null);
-		};
+		switch (tokenAlgo) {
+			case "RS256":
+				return Algorithm.RSA256((RSAPublicKey) publicKey, null);
+			case "RS384":
+				return Algorithm.RSA384((RSAPublicKey) publicKey, null);
+			case "RS512":
+				return Algorithm.RSA512((RSAPublicKey) publicKey, null);
+			default:
+				return Algorithm.RSA256((RSAPublicKey) publicKey, null);
+		}
 	}
-
 	@SuppressWarnings("unchecked")
 	public MosipUserDto buildMosipUser(DecodedJWT decodedJWT, String jwtToken) {
 		MosipUserDto mosipUserDto = new MosipUserDto();
@@ -269,7 +278,6 @@ public class ValidateTokenHelper {
 		LOGGER.info("user (offline verification done): " + mosipUserDto.getUserId());
 		return mosipUserDto;
 	}
-
 	public ImmutablePair<HttpStatus, MosipUserDto> doOnlineTokenValidation(String jwtToken, RestTemplate restTemplate) {
 		if ("".equals(issuerURI) || "".equals(issuerInternalURI)) {
 			LOGGER.warn("OIDC validate URL is not available in config file, not requesting for token validation.");
@@ -315,7 +323,6 @@ public class ValidateTokenHelper {
 		}
 		return ImmutablePair.of(HttpStatus.UNAUTHORIZED, null);
 	}
-
 	private String getUserInfoPath(DecodedJWT decodedJWT) {
 		if (userInfoUrl == null || userInfoUrl.isEmpty()) {
 			String realm = getRealM(decodedJWT);
@@ -323,7 +330,6 @@ public class ValidateTokenHelper {
 		}
 		return userInfoUrl;
 	}
-
 	public ImmutablePair<HttpStatus, MosipUserDto> doOnlineTokenValidation(String jwtToken, WebClient webClient) {
 		if ("".equals(issuerURI) || "".equals(issuerInternalURI)) {
 			LOGGER.warn("OIDC validate URL is not available in config file, not requesting for token validation.");
@@ -334,11 +340,17 @@ public class ValidateTokenHelper {
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(AuthAdapterConstant.AUTH_REQUEST_COOOKIE_HEADER, AuthAdapterConstant.BEARER_STR + jwtToken);
 		String userInfoPath = getUserInfoPath(decodedJWT);
-		ClientResponse response = webClient.method(HttpMethod.GET).uri(userInfoPath).headers(httpHeaders -> {
-			httpHeaders.addAll(headers);
-		}).exchangeToMono(Mono::just).block();
-		if (response != null && response.statusCode() == HttpStatus.OK) {
-			ObjectNode responseBody = response.bodyToMono(ObjectNode.class).block();
+		try {
+			String rawBody = webClient.method(HttpMethod.GET).uri(userInfoPath).headers(httpHeaders -> {
+				httpHeaders.addAll(headers);
+			}).retrieve().bodyToMono(String.class).block();
+			ObjectNode responseBody = null;
+			if (rawBody != null && !rawBody.isBlank()) {
+				JsonNode parsed = objectMapper.readTree(rawBody);
+				if (parsed instanceof ObjectNode objectNode) {
+					responseBody = objectNode;
+				}
+			}
 			if (responseBody != null) {
 				List<ServiceError> validationErrorsList = ExceptionUtils.getServiceErrorList(responseBody.asText());
 				if (!validationErrorsList.isEmpty()) {
@@ -356,8 +368,13 @@ public class ValidateTokenHelper {
 			MosipUserDto mosipUserDto = buildMosipUser(decodedJWT, jwtToken);
 			return ImmutablePair.of(HttpStatus.OK, mosipUserDto);
 		}
+		catch (WebClientResponseException e) {
+			// Spring 7 retrieve() throws on non-2xx; kernel-auth treated that as unauthorized
+		}
+		catch (IOException e) {
+			LOGGER.error("Error Parsing Response data {}", e.getMessage(), e);
+		}
 		LOGGER.error("user authentication failed for the provided token (WebClient).");
 		return ImmutablePair.of(HttpStatus.UNAUTHORIZED, null);
 	}
-
 }

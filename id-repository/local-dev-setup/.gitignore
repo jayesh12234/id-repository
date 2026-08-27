@@ -1,0 +1,8 @@
+# Host-app file logs (logging.file.path=logs relative to CWD)
+logs/
+
+# PKCS12 keystores (local only — see keys/README.md)
+keys/*.p12
+
+# Ephemeral WSL→Windows Maven launcher (created during `bash … build`, then removed)
+.wsl-mvn-build.cmd

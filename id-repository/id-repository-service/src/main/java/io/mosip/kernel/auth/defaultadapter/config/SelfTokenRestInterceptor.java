@@ -23,35 +23,28 @@ import io.mosip.kernel.auth.defaultadapter.helper.TokenValidationHelper;
 import io.mosip.kernel.auth.defaultadapter.model.TokenHolder;
 
 /**
- * Spring Framework 7 compatible shadow of kernel-auth {@code SelfTokenRestInterceptor}.
- * <p>
- * Loaded from {@code id-repository-service} before the {@code kernel-auth-adapter.jar} class.
- * Required even with {@code kernel-auth-adapter} 1.3.1 (mosip-openid-bridge): the published jar
- * still invokes {@code HttpHeaders.get(Object)} on 401 retry, which Spring 7 removed.
- * Replaces that path with {@code getOrEmpty(String)} and remove/add.
- * </p>
- *
- * @see SelfTokenExchangeFilterFunction
+ * Spring Framework 7 shadow of kernel-auth {@code SelfTokenRestInterceptor} (v1.3.1).
+ * API change vs openid-bridge: {@code HttpHeaders.get(Object)} / {@code replace} → {@code getOrEmpty} / remove-add.
  */
 public class SelfTokenRestInterceptor implements ClientHttpRequestInterceptor {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SelfTokenRestInterceptor.class);
 
-	private final String clientID;
+	private String clientID;
 
-	private final String clientSecret;
+	private String clientSecret;
 
-	private final String appID;
+	private String appID;
 
-	private final TokenHolder<String> cachedToken;
+	private TokenHolder<String> cachedToken;
 
-	private final RestTemplate restTemplate;
+	private RestTemplate restTemplate;
 
-	private final TokenHelper tokenHelper;
+	private TokenHelper tokenHelper;
 
-	private final TokenValidationHelper tokenValidationHelper;
+	private TokenValidationHelper tokenValidationHelper;
 
-	public SelfTokenRestInterceptor(Environment environment, RestTemplate plainRestTemplate,
+	public SelfTokenRestInterceptor(Environment environment, RestTemplate restTemplate,
 			TokenHolder<String> cachedToken, TokenHelper tokenHelper, TokenValidationHelper tokenValidationHelper,
 			String applName) {
 		clientID = environment.getProperty("mosip.iam.adapter.clientid." + applName,
@@ -61,7 +54,7 @@ public class SelfTokenRestInterceptor implements ClientHttpRequestInterceptor {
 		appID = environment.getProperty("mosip.iam.adapter.appid." + applName,
 				environment.getProperty("mosip.iam.adapter.appid", ""));
 		this.cachedToken = cachedToken;
-		this.restTemplate = plainRestTemplate;
+		this.restTemplate = restTemplate;
 		this.tokenHelper = tokenHelper;
 		this.tokenValidationHelper = tokenValidationHelper;
 	}
@@ -78,37 +71,31 @@ public class SelfTokenRestInterceptor implements ClientHttpRequestInterceptor {
 			}
 			cachedToken.setToken(authToken);
 		}
-
 		request.getHeaders().add(AuthAdapterConstant.AUTH_HEADER_COOKIE,
 				AuthAdapterConstant.AUTH_HEADER + cachedToken.getToken());
 
-		ClientHttpResponse response = execution.execute(request, body);
-		if (response.getStatusCode() != HttpStatus.UNAUTHORIZED) {
-			return response;
+		ClientHttpResponse clientHttpResponse = execution.execute(request, body);
+		if (clientHttpResponse.getStatusCode() != HttpStatus.UNAUTHORIZED) {
+			return clientHttpResponse;
 		}
 
 		synchronized (this) {
-			if (!isTokenValid((String) cachedToken.getToken())) {
+			if (!isTokenValid(cachedToken.getToken())) {
 				String authToken = tokenHelper.getClientToken(clientID, clientSecret, appID, restTemplate);
 				cachedToken.setToken(authToken);
 			}
 		}
 
 		List<String> cookies = request.getHeaders().getOrEmpty(AuthAdapterConstant.AUTH_HEADER_COOKIE).stream()
-				.filter(cookie -> !cookie.contains(AuthAdapterConstant.AUTH_HEADER))
+				.filter(str -> !str.contains(AuthAdapterConstant.AUTH_HEADER))
 				.collect(Collectors.toList());
-
 		request.getHeaders().remove(AuthAdapterConstant.AUTH_HEADER_COOKIE);
 		cookies.forEach(cookie -> request.getHeaders().add(AuthAdapterConstant.AUTH_HEADER_COOKIE, cookie));
 		request.getHeaders().add(AuthAdapterConstant.AUTH_HEADER_COOKIE,
 				AuthAdapterConstant.AUTH_HEADER + cachedToken.getToken());
-
 		return execution.execute(request, body);
 	}
-
 	private boolean isTokenValid(String authToken) {
-		return Objects.nonNull(
-				tokenValidationHelper.getOnlineTokenValidatedUserResponse(authToken, restTemplate));
+		return Objects.nonNull(tokenValidationHelper.getOnlineTokenValidatedUserResponse(authToken, restTemplate));
 	}
-
 }

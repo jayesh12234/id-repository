@@ -23,27 +23,26 @@ import io.mosip.kernel.auth.defaultadapter.model.TokenHolder;
 import reactor.core.publisher.Mono;
 
 /**
- * Spring Framework 7 compatible shadow of kernel-auth {@code SelfTokenExchangeFilterFunction}.
- * Replaces {@code HttpHeaders.get(Object)} with {@code getOrEmpty(String)} and rebuilds
- * {@link ClientRequest} on 401 retry instead of mutating read-only headers.
+ * Spring Framework 7 shadow of kernel-auth {@code SelfTokenExchangeFilterFunction} (v1.3.1).
+ * API changes vs openid-bridge: {@code getOrEmpty} and rebuild {@link ClientRequest} (headers are read-only).
  */
 public class SelfTokenExchangeFilterFunction implements ExchangeFilterFunction {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SelfTokenExchangeFilterFunction.class);
 
-	private final String clientID;
+	private String clientID;
 
-	private final String clientSecret;
+	private String clientSecret;
 
-	private final String appID;
+	private String appID;
 
-	private final TokenHolder cachedToken;
+	private TokenHolder cachedToken;
 
-	private final TokenHelper tokenHelper;
+	private TokenHelper tokenHelper;
 
-	private final TokenValidationHelper tokenValidationHelper;
+	private TokenValidationHelper tokenValidationHelper;
 
-	private final WebClient webClient;
+	private WebClient webClient;
 
 	public SelfTokenExchangeFilterFunction(Environment environment, WebClient webClient, TokenHolder cachedToken,
 			TokenHelper tokenHelper, TokenValidationHelper tokenValidationHelper, String applName) {
@@ -61,28 +60,27 @@ public class SelfTokenExchangeFilterFunction implements ExchangeFilterFunction {
 
 	@Override
 	public Mono<ClientResponse> filter(ClientRequest request, ExchangeFunction next) {
-		if (currentToken() == null) {
+		if (cachedToken.getToken() == null) {
 			String authToken = tokenHelper.getClientToken(clientID, clientSecret, appID, webClient);
 			if (Objects.isNull(authToken)) {
-				LOGGER.error("Self-token fetch failed for clientId={}, appId={}", clientID, appID);
+				LOGGER.error("there is some issue with getting token with clienid and secret");
 				throw new AuthAdapterException(AuthAdapterErrorCode.SELF_AUTH_TOKEN_NULL.getErrorCode(),
 						AuthAdapterErrorCode.SELF_AUTH_TOKEN_NULL.getErrorMessage());
 			}
 			cachedToken.setToken(authToken);
 		}
 
-		ClientRequest authorized = ClientRequest.from(request)
+		ClientRequest newReq = ClientRequest.from(request)
 				.header(AuthAdapterConstant.AUTH_HEADER_COOKIE,
-						AuthAdapterConstant.AUTH_HEADER + currentToken())
+						AuthAdapterConstant.AUTH_HEADER + cachedToken.getToken())
 				.build();
-
-		ClientResponse response = next.exchange(authorized).block();
+		ClientResponse response = next.exchange(newReq).block();
 		if (response != null && response.statusCode() != HttpStatus.UNAUTHORIZED) {
 			return Mono.just(response);
 		}
 
 		synchronized (this) {
-			if (!isTokenValid(currentToken())) {
+			if (!isTokenValid((String) cachedToken.getToken())) {
 				String authToken = tokenHelper.getClientToken(clientID, clientSecret, appID, webClient);
 				cachedToken.setToken(authToken);
 			}
@@ -91,23 +89,17 @@ public class SelfTokenExchangeFilterFunction implements ExchangeFilterFunction {
 		List<String> cookies = request.headers().getOrEmpty(AuthAdapterConstant.AUTH_HEADER_COOKIE).stream()
 				.filter(str -> !str.contains(AuthAdapterConstant.AUTH_HEADER))
 				.collect(Collectors.toList());
-
 		ClientRequest.Builder retryBuilder = ClientRequest.from(request);
 		retryBuilder.headers(headers -> {
 			headers.remove(AuthAdapterConstant.AUTH_HEADER_COOKIE);
 			cookies.forEach(cookie -> headers.add(AuthAdapterConstant.AUTH_HEADER_COOKIE, cookie));
 			headers.add(AuthAdapterConstant.AUTH_HEADER_COOKIE,
-					AuthAdapterConstant.AUTH_HEADER + currentToken());
+					AuthAdapterConstant.AUTH_HEADER + cachedToken.getToken());
 		});
 		return next.exchange(retryBuilder.build());
-	}
-
-	private String currentToken() {
-		return (String) cachedToken.getToken();
 	}
 
 	private boolean isTokenValid(String authToken) {
 		return Objects.nonNull(tokenValidationHelper.doOnlineTokenValidation(authToken, webClient));
 	}
-
 }

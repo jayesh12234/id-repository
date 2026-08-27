@@ -96,7 +96,7 @@
 		<kernel.idgenerator.vid.version>${mosip.kernel.version}</kernel.idgenerator.vid.version>
 		<kernel.khazana.version>1.3.0</kernel.khazana.version>
 	</properties>
-		<dependencyManagement>
+	<dependencyManagement>
 		<dependencies>
 			<!-- Align Jackson 2.x annotations with databind (kernel-auth-adapter shades older annotations) -->
 			<dependency>
@@ -542,7 +542,8 @@
 						<includeOnlyProperty>^git.commit.id.(abbrev|full)$</includeOnlyProperty>
 					</includeOnlyProperties>
 					<commitIdGenerationMode>full</commitIdGenerationMode>
-					<dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+					<!-- Git root is the repo (parent of Maven multi-module dir id-repository/) -->
+					<dotGitDirectory>${maven.multiModuleProjectDirectory}/../.git</dotGitDirectory>
 					<!-- <format>json</format> -->
 				</configuration>
 			</plugin>

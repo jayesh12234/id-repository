@@ -642,7 +642,7 @@ public class IdRepoController {
 	}
 
 	@PreAuthorize("hasAnyRole(@identityAuthorizedRoles.getRemainingUpdateCountByIndividualId())")
-	@GetMapping(path = "/{individualId}/update-counts", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(path = { "/{individualId}/update-counts", "/update-counts" }, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(summary = "Get Remaining update count by Individual Id Request", description = "Get Remaining update count by Individual Id Request", tags = {
 			"id-repo-controller" })
 	@ApiResponses(value = {
@@ -660,9 +660,13 @@ public class IdRepoController {
 	 * @return per-attribute remaining update counts
 	 */
 	public ResponseEntity<ResponseWrapper<AttributeListDto>> getRemainingUpdateCountByIndividualId(
-			@PathVariable String individualId, @RequestParam(name = ID_TYPE, required = false) @Nullable String idType,
+			@PathVariable(required = false) String individualId, @RequestParam(name = ID_TYPE, required = false) @Nullable String idType,
 			@RequestParam(name = "attribute_list", required = false) @Nullable List<String> attributeList)
 			throws IdRepoAppException {
+		if (StringUtils.isBlank(individualId)) {
+			throw new IdRepoAppException(INVALID_INPUT_PARAMETER.getErrorCode(),
+					String.format(INVALID_INPUT_PARAMETER.getErrorMessage(), "individualId"));
+		}
 		IdType individualIdType = Objects.isNull(idType) ? getIdType(individualId) : validator.validateIdType(idType);
 		auditHelper.audit(AuditModules.ID_REPO_CORE_SERVICE, AuditEvents.GET_RID_BY_INDIVIDUALID, individualId,
 				individualIdType, "Get Remaining update count by Individual Id Request received");
